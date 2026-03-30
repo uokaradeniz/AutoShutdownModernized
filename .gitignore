@@ -1,0 +1,28 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+*.DotSettings.user
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build and deployment
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+TestResults/
+*.log
+
+# NuGet
+*.nuget.props
+*.nuget.targets
+.nuget/
