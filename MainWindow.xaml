@@ -3,26 +3,112 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AutoShutdownModernized"
+        xmlns:viewmodels="clr-namespace:AutoShutdownModernized.ViewModels"
         mc:Ignorable="d"
-        Title="Auto Shutdown Modernized" Height="200" Width="400">
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        Title="Auto Shutdown Modernized" 
+        Height="150" Width="300"
+        WindowStyle="ToolWindow"
+        AllowsTransparency="False"
+        Background="#1C1C1C"
+        Topmost="True"
+        ResizeMode="NoResize"
+        MouseDown="Window_MouseDown"
+        WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <Style x:Key="PrimaryBtn" TargetType="Button">
+            <Setter Property="Background" Value="#0078D4"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#106EBE"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#0D47A1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         
-        <Label Content="Enter time in minutes:" Grid.Row="0" Margin="0,0,0,5"/>
-        <TextBox x:Name="TimeInput" Grid.Row="1" Height="30" FontSize="16" Margin="0,0,0,15" PreviewTextInput="TimeInput_PreviewTextInput"/>
-        
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-            <Button x:Name="StartButton" Content="Start Timer" Width="100" Height="35" Margin="0,0,10,0" Click="StartButton_Click"/>
-            <Button x:Name="CancelButton" Content="Cancel" Width="100" Height="35" Click="CancelButton_Click" IsEnabled="False"/>
-        </StackPanel>
-        
-        <TextBlock x:Name="CountdownDisplay" Grid.Row="3" Text="00:00:00" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+        <Style x:Key="CancelBtn" TargetType="Button" BasedOn="{StaticResource PrimaryBtn}">
+            <Setter Property="Background" Value="#C42B1C"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#A82315"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#8A1D10"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
 
-    </Grid>
+    <Border Background="#1C1C1C" CornerRadius="12" BorderBrush="#333333" BorderThickness="1">
+        <Grid Margin="15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <Grid Grid.Row="0" Margin="0,0,0,10">
+                <TextBlock Text="Auto Shutdown" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <Button Content="✕" Width="24" Height="24" HorizontalAlignment="Right" Background="Transparent" Foreground="White" BorderThickness="0" Click="CloseButton_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="12">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+
+            <!-- Configuration Mode -->
+            <StackPanel Grid.Row="1" x:Name="ConfigStackPanel">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsScheduled}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="Minutes to shutdown:" Foreground="#BBBBBB" FontSize="12" Margin="0,0,0,5" />
+                <TextBox Text="{Binding SelectedTime, UpdateSourceTrigger=PropertyChanged}" Background="#2D2D2D" Foreground="White" BorderBrush="#333333" BorderThickness="1" Padding="5" Margin="0,0,0,10"/>
+                <Button Content="Start" Command="{Binding StartShutdownCommand}" Height="30" Style="{StaticResource PrimaryBtn}" />
+            </StackPanel>
+
+            <!-- Countdown Mode -->
+            <StackPanel Grid.Row="1" x:Name="CountdownStackPanel">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsScheduled}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="Shutting down in:" Foreground="#BBBBBB" FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,5" />
+                <TextBlock Text="{Binding RemainingTime, StringFormat=hh\\:mm\\:ss}" FontSize="28" FontWeight="Light" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,10" />
+                <Button Content="Cancel" Command="{Binding CancelShutdownCommand}" Height="30" Style="{StaticResource CancelBtn}" />
+            </StackPanel>
+        </Grid>
+    </Border>
 </Window>
