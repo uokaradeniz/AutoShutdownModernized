@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,7 +15,17 @@ public partial class MainViewModel : ObservableObject
     private readonly Dispatcher _dispatcher;
 
     [ObservableProperty]
-    private int _selectedTime;
+    private int _selectedHours;
+
+    [ObservableProperty]
+    private int _selectedMinutes;
+
+    [ObservableProperty]
+    private int _selectedSeconds;
+
+    public int[] Hours { get; } = Enumerable.Range(0, 100).ToArray();
+    public int[] Minutes { get; } = Enumerable.Range(0, 60).ToArray();
+    public int[] Seconds { get; } = Enumerable.Range(0, 60).ToArray();
 
     [ObservableProperty]
     private bool _isScheduled;
@@ -30,7 +41,9 @@ public partial class MainViewModel : ObservableObject
         // Using main dispatcher for UI updates
         _dispatcher = Dispatcher.CurrentDispatcher;
         
-        SelectedTime = 60; // default to 60 minutes
+        SelectedHours = 1; // default to 1 hour
+        SelectedMinutes = 0;
+        SelectedSeconds = 0;
         
         _trackerService.StateChanged += OnStateChanged;
     }
@@ -47,9 +60,10 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void StartShutdown()
     {
-        if (SelectedTime > 0)
+        var totalTime = new TimeSpan(SelectedHours, SelectedMinutes, SelectedSeconds);
+        if (totalTime.TotalSeconds > 0)
         {
-            _shutdownService.ScheduleShutdown(TimeSpan.FromMinutes(SelectedTime));
+            _shutdownService.ScheduleShutdown(totalTime);
         }
     }
 
@@ -58,5 +72,18 @@ public partial class MainViewModel : ObservableObject
     {
         _shutdownService.CancelShutdown();
     }
-}
 
+    [RelayCommand]
+    private void AdjustTime(string parameter)
+    {
+        switch (parameter)
+        {
+            case "H+": SelectedHours = (SelectedHours + 1) % 100; break;
+            case "H-": SelectedHours = (SelectedHours - 1 + 100) % 100; break;
+            case "M+": SelectedMinutes = (SelectedMinutes + 1) % 60; break;
+            case "M-": SelectedMinutes = (SelectedMinutes - 1 + 60) % 60; break;
+            case "S+": SelectedSeconds = (SelectedSeconds + 1) % 60; break;
+            case "S-": SelectedSeconds = (SelectedSeconds - 1 + 60) % 60; break;
+        }
+    }
+}

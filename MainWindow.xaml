@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Auto Shutdown Modernized"
-        Height="230"
+        Height="350"
         Width="320"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -101,6 +101,82 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="TumblerListBoxItem" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="0,4"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#888888"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border Background="Transparent" SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="FontSize" Value="24"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#CCCCCC"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TumblerListBox" TargetType="ListBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Hidden"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+            <Setter Property="VirtualizingPanel.ScrollUnit" Value="Item"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource TumblerListBoxItem}"/>
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding StringFormat={}{0:D2}}"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TimeSpinnerBtn" TargetType="RepeatButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#888888"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Background" Value="#333333"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Foreground" Value="#0A84FF"/>
+                                <Setter Property="Background" Value="#262626"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Window.Resources>
 
     <Border Background="#171717" CornerRadius="14" BorderBrush="#2C2C2C" BorderThickness="1">
@@ -170,13 +246,67 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <TextBlock Text="Minutes to shutdown:"
+                <TextBlock Text="Schedule shutdown (HH:MM:SS):"
                            Foreground="#B8B8B8"
                            FontSize="12"
+                           HorizontalAlignment="Center"
                            Margin="0,0,0,6" />
-                <TextBox Text="{Binding SelectedTime, UpdateSourceTrigger=PropertyChanged}"
-                         Style="{StaticResource ModernTextBox}"
-                         Margin="0,0,0,14"/>
+                
+                <Grid Margin="0,0,0,14" HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="60"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Border Grid.Column="0" Grid.ColumnSpan="5" Height="50" Background="#262626" CornerRadius="6" VerticalAlignment="Center" IsHitTestVisible="False"/>
+
+                    <Border Grid.Column="0" Background="Transparent" MouseWheel="TimePart_MouseWheel" Tag="H">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <RepeatButton Grid.Row="0" Content="⌃" Command="{Binding AdjustTimeCommand}" CommandParameter="H+" Style="{StaticResource TimeSpinnerBtn}"/>
+                            <TextBlock Grid.Row="1" Text="{Binding SelectedHours, StringFormat={}{0:D2}}" FontSize="28" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <RepeatButton Grid.Row="2" Content="⌄" Command="{Binding AdjustTimeCommand}" CommandParameter="H-" Style="{StaticResource TimeSpinnerBtn}"/>
+                        </Grid>
+                    </Border>
+                    
+                    <TextBlock Grid.Column="1" Text=":" FontSize="28" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    
+                    <Border Grid.Column="2" Background="Transparent" MouseWheel="TimePart_MouseWheel" Tag="M">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <RepeatButton Grid.Row="0" Content="⌃" Command="{Binding AdjustTimeCommand}" CommandParameter="M+" Style="{StaticResource TimeSpinnerBtn}"/>
+                            <TextBlock Grid.Row="1" Text="{Binding SelectedMinutes, StringFormat={}{0:D2}}" FontSize="28" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <RepeatButton Grid.Row="2" Content="⌄" Command="{Binding AdjustTimeCommand}" CommandParameter="M-" Style="{StaticResource TimeSpinnerBtn}"/>
+                        </Grid>
+                    </Border>
+                    
+                    <TextBlock Grid.Column="3" Text=":" FontSize="28" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    
+                    <Border Grid.Column="4" Background="Transparent" MouseWheel="TimePart_MouseWheel" Tag="S">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <RepeatButton Grid.Row="0" Content="⌃" Command="{Binding AdjustTimeCommand}" CommandParameter="S+" Style="{StaticResource TimeSpinnerBtn}"/>
+                            <TextBlock Grid.Row="1" Text="{Binding SelectedSeconds, StringFormat={}{0:D2}}" FontSize="28" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <RepeatButton Grid.Row="2" Content="⌄" Command="{Binding AdjustTimeCommand}" CommandParameter="S-" Style="{StaticResource TimeSpinnerBtn}"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+
                 <Button Content="Start"
                         Command="{Binding StartShutdownCommand}"
                         Height="44"
