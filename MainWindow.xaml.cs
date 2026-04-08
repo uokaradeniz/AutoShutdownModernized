@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using AutoShutdownModernized.ViewModels;
 
 namespace AutoShutdownModernized;
@@ -27,9 +28,13 @@ public partial class MainWindow : Window
         Application.Current.Shutdown();
     }
 
-    private void TimePart_MouseWheel(object sender, MouseWheelEventArgs e)
+    private void TimeSelectionGrid_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
-        if (sender is Border border && DataContext is MainViewModel vm)
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        var border = FindTimePartBorder(e.OriginalSource as DependencyObject);
+        if (border is not null)
         {
             string part = border.Tag?.ToString() ?? "";
             string direction = e.Delta > 0 ? "+" : "-";
@@ -39,5 +44,18 @@ public partial class MainWindow : Window
                 e.Handled = true;
             }
         }
+    }
+
+    private static Border? FindTimePartBorder(DependencyObject? current)
+    {
+        while (current is not null)
+        {
+            if (current is Border border && border.Tag is string tag && !string.IsNullOrWhiteSpace(tag))
+                return border;
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        return null;
     }
 }

@@ -252,7 +252,10 @@
                            HorizontalAlignment="Center"
                            Margin="0,0,0,6" />
                 
-                <Grid Margin="0,0,0,14" HorizontalAlignment="Center">
+                <Grid x:Name="TimeSelectionGrid"
+                      Margin="0,0,0,14"
+                      HorizontalAlignment="Center"
+                      PreviewMouseWheel="TimeSelectionGrid_PreviewMouseWheel">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="60"/>
                         <ColumnDefinition Width="10"/>
@@ -263,7 +266,7 @@
                     
                     <Border Grid.Column="0" Grid.ColumnSpan="5" Height="50" Background="#262626" CornerRadius="6" VerticalAlignment="Center" IsHitTestVisible="False"/>
 
-                    <Border Grid.Column="0" Background="Transparent" MouseWheel="TimePart_MouseWheel" Tag="H">
+                    <Border Grid.Column="0" Background="Transparent" Tag="H">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -278,7 +281,7 @@
                     
                     <TextBlock Grid.Column="1" Text=":" FontSize="28" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     
-                    <Border Grid.Column="2" Background="Transparent" MouseWheel="TimePart_MouseWheel" Tag="M">
+                    <Border Grid.Column="2" Background="Transparent" Tag="M">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -293,7 +296,7 @@
                     
                     <TextBlock Grid.Column="3" Text=":" FontSize="28" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     
-                    <Border Grid.Column="4" Background="Transparent" MouseWheel="TimePart_MouseWheel" Tag="S">
+                    <Border Grid.Column="4" Background="Transparent" Tag="S">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
