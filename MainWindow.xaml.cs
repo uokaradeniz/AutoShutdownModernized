@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Drawing.Drawing2D;
 using AutoShutdownModernized.ViewModels;
 using Application = System.Windows.Application;
 
@@ -39,12 +40,61 @@ public partial class MainWindow
 
         return new NotifyIcon
         {
-            Icon = SystemIcons.Application,
+            Icon = CreateTrayIconImage(),
             Text = GetLocalizedString("AppTitle", "Auto Shutdown Modernized"),
             Visible = true,
             ContextMenuStrip = menu
         };
     }
+
+    private static Icon CreateTrayIconImage()
+    {
+        var resourceInfo = Application.GetResourceStream(new Uri("pack://application:,,,/Resources/icon.png", UriKind.Absolute))
+                           ?? throw new InvalidOperationException("Tray icon resource was not found.");
+
+        using var source = new Bitmap(resourceInfo.Stream);
+        using var rounded = CreateRoundedBitmap(source, 48);
+        var hIcon = rounded.GetHicon();
+
+        try
+        {
+            using var tempIcon = System.Drawing.Icon.FromHandle(hIcon);
+            return (Icon)tempIcon.Clone();
+        }
+        finally
+        {
+            DestroyIcon(hIcon);
+        }
+    }
+
+    private static Bitmap CreateRoundedBitmap(Bitmap source, int size)
+    {
+        var bitmap = new Bitmap(size, size, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+        using var graphics = Graphics.FromImage(bitmap);
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+        graphics.CompositingQuality = CompositingQuality.HighQuality;
+        graphics.Clear(System.Drawing.Color.Transparent);
+
+        using var path = new GraphicsPath();
+        const int radius = 10;
+        var rect = new RectangleF(0, 0, size - 1, size - 1);
+        float diameter = radius * 2;
+
+        path.AddArc(rect.X, rect.Y, diameter, diameter, 180, 90);
+        path.AddArc(rect.Right - diameter, rect.Y, diameter, diameter, 270, 90);
+        path.AddArc(rect.Right - diameter, rect.Bottom - diameter, diameter, diameter, 0, 90);
+        path.AddArc(rect.X, rect.Bottom - diameter, diameter, diameter, 90, 90);
+        path.CloseFigure();
+
+        graphics.SetClip(path);
+        graphics.DrawImage(source, new Rectangle(0, 0, size, size));
+
+        return bitmap;
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+    private static extern bool DestroyIcon(IntPtr hIcon);
 
     private void MainWindow_StateChanged(object? sender, EventArgs e)
     {

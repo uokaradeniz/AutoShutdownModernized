@@ -14,4 +14,8 @@
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Resource Include="Resources\icon.png" />
+    </ItemGroup>
+
 </Project>
