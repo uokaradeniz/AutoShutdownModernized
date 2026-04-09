@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AutoShutdownModernized.Services;
+﻿namespace AutoShutdownModernized.Services;
 
 public interface IShutdownService
 {

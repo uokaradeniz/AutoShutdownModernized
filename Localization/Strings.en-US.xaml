@@ -1,0 +1,17 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <sys:String x:Key="AppTitle" xmlns:sys="clr-namespace:System;assembly=mscorlib">Auto Shutdown Modernized</sys:String>
+    <sys:String x:Key="MainHeader" xmlns:sys="clr-namespace:System;assembly=mscorlib">Auto Shutdown</sys:String>
+    <sys:String x:Key="ScheduleShutdownText" xmlns:sys="clr-namespace:System;assembly=mscorlib">Schedule shutdown</sys:String>
+    <sys:String x:Key="TimeFormatLabel" xmlns:sys="clr-namespace:System;assembly=mscorlib">HH:MM:SS</sys:String>
+    <sys:String x:Key="StartButtonText" xmlns:sys="clr-namespace:System;assembly=mscorlib">Start</sys:String>
+    <sys:String x:Key="CountdownText" xmlns:sys="clr-namespace:System;assembly=mscorlib">Shutting down in:</sys:String>
+    <sys:String x:Key="CancelButtonText" xmlns:sys="clr-namespace:System;assembly=mscorlib">Cancel</sys:String>
+    <sys:String x:Key="TrayShowText" xmlns:sys="clr-namespace:System;assembly=mscorlib">Show</sys:String>
+    <sys:String x:Key="TrayExitText" xmlns:sys="clr-namespace:System;assembly=mscorlib">Exit</sys:String>
+    <sys:String x:Key="TrayBalloonTitle" xmlns:sys="clr-namespace:System;assembly=mscorlib">Auto Shutdown Modernized</sys:String>
+    <sys:String x:Key="TrayBalloonMessage" xmlns:sys="clr-namespace:System;assembly=mscorlib">The app was minimized to the tray.</sys:String>
+    <sys:String x:Key="CloseButtonTooltip" xmlns:sys="clr-namespace:System;assembly=mscorlib">Close</sys:String>
+    <sys:String x:Key="TrayButtonTooltip" xmlns:sys="clr-namespace:System;assembly=mscorlib">Minimize to tray</sys:String>
+</ResourceDictionary>
+

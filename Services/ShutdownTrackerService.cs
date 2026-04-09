@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoShutdownModernized.Models;
+﻿using AutoShutdownModernized.Models;
 using Microsoft.Extensions.Hosting;
 
 namespace AutoShutdownModernized.Services;

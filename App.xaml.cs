@@ -1,8 +1,8 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
+using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using AutoShutdownModernized.Localization;
 using AutoShutdownModernized.Services;
 using AutoShutdownModernized.ViewModels;
 
@@ -11,7 +11,7 @@ namespace AutoShutdownModernized
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
         private IHost? _host;
 
@@ -20,7 +20,7 @@ namespace AutoShutdownModernized
         public App()
         {
             _host = Host.CreateDefaultBuilder()
-                .ConfigureServices((context, services) =>
+                .ConfigureServices((_, services) =>
                 {
                     services.AddSingleton<IShutdownService, ShutdownService>();
                     services.AddSingleton<ShutdownTrackerService>();
@@ -37,6 +37,7 @@ namespace AutoShutdownModernized
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            LocalizationManager.ApplySupportedCulture(CultureInfo.CurrentUICulture);
             await _host!.StartAsync();
             
             var mainWindow = _host.Services.GetRequiredService<MainWindow>();
@@ -47,8 +48,16 @@ namespace AutoShutdownModernized
         {
             if (_host != null)
             {
-                await _host.StopAsync();
-                _host.Dispose();
+                try
+                {
+                    var shutdownService = _host.Services.GetService<IShutdownService>();
+                    shutdownService?.CancelShutdown();
+                }
+                finally
+                {
+                    await _host.StopAsync();
+                    _host.Dispose();
+                }
             }
             base.OnExit(e);
         }

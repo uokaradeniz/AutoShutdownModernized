@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Windows.Threading;
+﻿using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using AutoShutdownModernized.Models;
@@ -23,15 +21,14 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private int _selectedSeconds;
 
-    public int[] Hours { get; } = Enumerable.Range(0, 100).ToArray();
-    public int[] Minutes { get; } = Enumerable.Range(0, 60).ToArray();
-    public int[] Seconds { get; } = Enumerable.Range(0, 60).ToArray();
-
     [ObservableProperty]
     private bool _isScheduled;
 
     [ObservableProperty]
     private TimeSpan _remainingTime;
+
+    [ObservableProperty]
+    private string _remainingTimeText = "00:00:00";
 
     public MainViewModel(IShutdownService shutdownService, IShutdownTrackerService trackerService)
     {
@@ -54,7 +51,16 @@ public partial class MainViewModel : ObservableObject
         {
             IsScheduled = state.IsScheduled;
             RemainingTime = state.RemainingTime;
+            RemainingTimeText = FormatRemainingTime(state.RemainingTime);
         });
+    }
+
+    private static string FormatRemainingTime(TimeSpan remainingTime)
+    {
+        if (remainingTime < TimeSpan.Zero)
+            remainingTime = TimeSpan.Zero;
+
+        return $"{(int)remainingTime.TotalHours:D2}:{remainingTime.Minutes:D2}:{remainingTime.Seconds:D2}";
     }
 
     [RelayCommand]
