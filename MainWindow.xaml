@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="{DynamicResource AppTitle}"
-        Icon="pack://application:,,,/Resources/icon.png"
+        Icon="pack://application:,,,/Resources/icon.ico"
         Width="320"
         SizeToContent="Height"
         WindowStyle="None"
